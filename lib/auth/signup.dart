@@ -1,5 +1,9 @@
+import 'dart:js';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_example/auth/reset.dart';
 import 'package:firebase_example/auth/signin.dart';
+import 'package:firebase_example/pages/homepage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +11,29 @@ class Sign_Up extends StatelessWidget {
   Sign_Up({super.key});
   TextEditingController _emailcontroller = TextEditingController();
   TextEditingController _passwordcontroller = TextEditingController();
+
+  SignUp(email, pass, context) async {
+    try {
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: pass,
+      );
+      var authCredential = credential.user;
+      if (authCredential!.uid.isNotEmpty) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +126,11 @@ class Sign_Up extends StatelessWidget {
             const SizedBox(
               height: 25,
             ),
-            ElevatedButton(onPressed: () {}, child: Text("Sign Up")),
+            ElevatedButton(
+                onPressed: () {
+                  SignUp(_emailcontroller.text, _passwordcontroller.text, context);
+                },
+                child: Text("Sign Up")),
             const SizedBox(
               height: 25,
             ),

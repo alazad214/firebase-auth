@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_example/auth/reset.dart';
 import 'package:firebase_example/auth/signup.dart';
+import 'package:firebase_example/pages/homepage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +9,26 @@ class Sign_In extends StatelessWidget {
   Sign_In({super.key});
   TextEditingController _emailcontroller = TextEditingController();
   TextEditingController _passwordcontroller = TextEditingController();
+
+  SignIn(email, pass, context) async {
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: pass,
+      );
+      var authCredential = credential.user;
+      if (authCredential!.uid.isNotEmpty) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +121,12 @@ class Sign_In extends StatelessWidget {
             const SizedBox(
               height: 25,
             ),
-            ElevatedButton(onPressed: () {}, child: Text("Log In")),
+            ElevatedButton(
+                onPressed: () {
+                  SignIn(
+                      _emailcontroller.text, _passwordcontroller.text, context);
+                },
+                child: Text("Log In")),
             const SizedBox(
               height: 15,
             ),

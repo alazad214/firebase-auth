@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_example/auth/signin.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,10 @@ class Reset_Pass extends StatelessWidget {
   Reset_Pass({super.key});
   TextEditingController _emailcontroller = TextEditingController();
   TextEditingController _passwordcontroller = TextEditingController();
+
+  ResetPass(email, context) async {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +42,13 @@ class Reset_Pass extends StatelessWidget {
                     color: Colors.white70),
               ),
             ),
+            const SizedBox(
+              height: 35,
+            ),
             TextFormField(
-              controller: _passwordcontroller,
+              controller: _emailcontroller,
               decoration: InputDecoration(
-                hintText: "Password",
+                hintText: "Enter Your Email",
                 prefixIcon: const Icon(Icons.remove_red_eye),
                 border: OutlineInputBorder(
                   borderSide: const BorderSide(
@@ -58,7 +67,11 @@ class Reset_Pass extends StatelessWidget {
             const SizedBox(
               height: 25,
             ),
-            ElevatedButton(onPressed: () {}, child: Text("Reset")),
+            ElevatedButton(
+                onPressed: () {
+                  ResetPass(_emailcontroller.text, context);
+                },
+                child: Text("Reset")),
             const SizedBox(
               height: 25,
             ),
